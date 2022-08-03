@@ -5,15 +5,13 @@ const app = express();
 const { API_VERSION } = require("./config");
 
 // load routing
-// ....
+//..
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // Configure Header HTTP
-//....
 
-// Router Basic
-//......
+// route basic
 
 module.exports = app;
