@@ -75,7 +75,31 @@ function signIn(req, res) {
     }
   });
 }
+function getUsers(req, res) {
+  User.find().then((users) => {
+    if (!users) {
+      res.status(404).send({ message: "User Can't Be Found" });
+    } else {
+      res.status(200).send({ users });
+    }
+  });
+}
+function getUsersActive(req, res) {
+  console.log(req);
+  const query = req.query;
+
+  User.find({ active: query.active }).then((users) => {
+    if (!users) {
+      res.status(404).send({ message: "User Can't Be Found" });
+    } else {
+      res.status(200).send({ users });
+    }
+  });
+}
+
 module.exports = {
   signUp,
   signIn,
+  getUsers,
+  getUsersActive,
 };
