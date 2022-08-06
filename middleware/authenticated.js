@@ -19,7 +19,7 @@ exports.ensureAuth = (req, res, next) => {
       return res.status(404).send({ message: "The Token Expired!" });
     }
   } catch (ex) {
-    console.log(ex);
+    // console.log(ex);
     return res.status(404).send({ message: "Invalid Token!" });
   }
   req.user = payload;

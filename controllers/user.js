@@ -3,6 +3,7 @@ const path = require("path");
 const bcrypt = require("bcrypt-nodejs");
 const jwt = require("../services/jwt");
 const User = require("../models/user");
+const user = require("../models/user");
 
 function signUp(req, res) {
   const user = new User();
@@ -87,7 +88,7 @@ function getUsers(req, res) {
   });
 }
 function getUsersActive(req, res) {
-  console.log(req);
+  // console.log(req);
   const query = req.query;
 
   User.find({ active: query.active }).then((users) => {
@@ -101,7 +102,7 @@ function getUsersActive(req, res) {
 
 function uploadAvatar(req, res) {
   const params = req.params;
-  console.log("uploadAvatar");
+  // console.log("uploadAvatar");
 
   User.findById({ _id: params.id }, (err, userData) => {
     if (err) {
@@ -112,8 +113,8 @@ function uploadAvatar(req, res) {
       } else {
         let user = userData;
 
-        console.log(user);
-        console.log(req.files);
+        // console.log(user);
+        // console.log(req.files);
 
         if (req.files) {
           let filePath = req.files.avatar.path;
@@ -122,7 +123,7 @@ function uploadAvatar(req, res) {
 
           let extSplit = fileName.split(".");
           let fileExt = extSplit[1];
-          console.log(extSplit);
+          // console.log(extSplit);
 
           if (fileExt !== "png" && fileExt !== "jpg") {
             res.status(400).send({
@@ -170,6 +171,22 @@ function getAvatar(req, res) {
   });
 }
 
+function updateUser(req, res) {
+  const userData = req.body;
+  const params = req.params;
+
+  User.findByIdAndUpdate({ _id: params.id }, userData, (err, userUpdate) => {
+    if (err) {
+      res.status(500).send({ message: "Server error." });
+    } else {
+      if (!userUpdate) {
+        res.status(404).send({ message: "Couldn't Find an user" });
+      } else {
+        res.status(200).send({ message: "User Successfully Updated!." });
+      }
+    }
+  });
+}
 module.exports = {
   signUp,
   signIn,
@@ -177,4 +194,5 @@ module.exports = {
   getUsersActive,
   uploadAvatar,
   getAvatar,
+  updateUser,
 };
