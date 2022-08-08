@@ -125,7 +125,7 @@ function uploadAvatar(req, res) {
           let fileExt = extSplit[1];
           // console.log(extSplit);
 
-          if (fileExt !== "png" && fileExt !== "jpg") {
+          if ((fileExt !== "png", "PNG" && fileExt !== "jpg", "JPG")) {
             res.status(400).send({
               message:
                 "File Extension Is Not Valid. (Files Extensions Allow: .png y .jpg)",
@@ -171,21 +171,105 @@ function getAvatar(req, res) {
   });
 }
 
-function updateUser(req, res) {
-  const userData = req.body;
+async function updateUser(req, res) {
+  let userData = req.body;
+  userData.email = req.body.email.toLowerCase();
   const params = req.params;
+
+  if (userData.password) {
+    await bcrypt.hash(userData.password, null, null, (err, hash) => {
+      if (err) {
+        res.status(500).send({ message: "Error Encrypting The Password." });
+      } else {
+        userData.password = hash;
+      }
+    });
+  }
 
   User.findByIdAndUpdate({ _id: params.id }, userData, (err, userUpdate) => {
     if (err) {
-      res.status(500).send({ message: "Server error." });
+      res.status(500).send({ message: "Server Error!." });
     } else {
       if (!userUpdate) {
-        res.status(404).send({ message: "Couldn't Find an user" });
+        res.status(404).send({ message: "User Not Found." });
       } else {
-        res.status(200).send({ message: "User Successfully Updated!." });
+        res.status(200).send({ message: "User updated Successfully!!." });
       }
     }
   });
+}
+
+function activateUser(req, res) {
+  const { id } = req.params;
+  const { active } = req.body;
+
+  User.findByIdAndUpdate(id, { active }, (err, userStored) => {
+    if (err) {
+      res.status(500).send({ message: "Server Error." });
+    } else {
+      if (!userStored) {
+        res.status(404).send({ message: "User Not Found." });
+      } else {
+        if (active === true) {
+          res.status(200).send({ message: "User Activated Successfully!." });
+        } else {
+          res.status(200).send({ message: "User Deactivated Successfully!." });
+        }
+      }
+    }
+  });
+}
+
+function deleteUser(req, res) {
+  const { id } = req.params;
+
+  User.findByIdAndRemove(id, (err, userDeleted) => {
+    if (err) {
+      res.status(500).send({ message: "Server Error" });
+    } else {
+      if (!userDeleted) {
+        res.status(404).send({ message: "User not Found." });
+      } else {
+        res.status(200).send({ message: "User Deleted!." });
+      }
+    }
+  });
+}
+
+function signUpAdmin(req, res) {
+  const user = new User();
+
+  const { name, lastname, email, role, password } = req.body;
+  user.name = name;
+  user.lastname = lastname;
+  user.email = email.toLowerCase();
+  user.role = role;
+  user.active = true;
+
+  if (!password) {
+    res.status(500).send({ message: "The Password Is Mandatory. " });
+  } else {
+    bcrypt.hash(password, null, null, (err, hash) => {
+      if (err) {
+        res.status(500).send({ message: "Error Encrypting The Password." });
+      } else {
+        user.password = hash;
+
+        user.save((err, userStored) => {
+          if (err) {
+            res.status(500).send({ message: "The User Exist Already!." });
+          } else {
+            if (!userStored) {
+              res.status(500).send({ message: "Error Creating User!." });
+            } else {
+              // res.status(200).send({ user: userStored });
+              res.status(200).send({ message: "User Created Successfully!." });
+            }
+          }
+        });
+      }
+    });
+  }
 }
 module.exports = {
   signUp,
@@ -195,4 +279,7 @@ module.exports = {
   uploadAvatar,
   getAvatar,
   updateUser,
+  activateUser,
+  deleteUser,
+  signUpAdmin,
 };
