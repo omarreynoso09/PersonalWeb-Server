@@ -7,7 +7,7 @@ function addCourse(req, res) {
 
   course.save((err, courseStored) => {
     if (err) {
-      res.status(400).send({ code: 400, message: "." });
+      res.status(400).send({ code: 400, message: "Course Already Exist!" });
     } else {
       if (!courseStored) {
         res
@@ -69,7 +69,7 @@ function updateCourse(req, res) {
     if (err) {
       res.status(500).send({
         code: 500,
-        message: "Server Error, Try Again LaterServer Error, Try Again Later",
+        message: "Server Error, Try Again Later",
       });
     } else {
       if (!courseUpdate) {
