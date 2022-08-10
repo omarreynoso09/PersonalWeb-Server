@@ -102,19 +102,15 @@ function getUsersActive(req, res) {
 
 function uploadAvatar(req, res) {
   const params = req.params;
-  // console.log("uploadAvatar");
 
   User.findById({ _id: params.id }, (err, userData) => {
     if (err) {
-      res.status(500).send({ message: "Server Error!" });
+      res.status(500).send({ message: "Server Error, Try Again Later!" });
     } else {
       if (!userData) {
-        res.status(404).send({ message: "Couldn't Find an User." });
+        res.status(404).send({ message: "User Not Found!" });
       } else {
         let user = userData;
-
-        // console.log(user);
-        // console.log(req.files);
 
         if (req.files) {
           let filePath = req.files.avatar.path;
@@ -123,12 +119,11 @@ function uploadAvatar(req, res) {
 
           let extSplit = fileName.split(".");
           let fileExt = extSplit[1];
-          // console.log(extSplit);
 
-          if ((fileExt !== "png", "PNG" && fileExt !== "jpg", "JPG")) {
+          if (fileExt !== "png" && fileExt !== "jpg") {
             res.status(400).send({
               message:
-                "File Extension Is Not Valid. (Files Extensions Allow: .png y .jpg)",
+                "Image Extension Not Permitted (Permitted Extensions: .png y .jpg)",
             });
           } else {
             user.avatar = fileName;
@@ -137,12 +132,12 @@ function uploadAvatar(req, res) {
               user,
               (err, userResult) => {
                 if (err) {
-                  res.status(500).send({ message: "Error del servidor." });
+                  res
+                    .status(500)
+                    .send({ message: "Server Error, Try Again Later!" });
                 } else {
                   if (!userResult) {
-                    res
-                      .status(404)
-                      .send({ message: "Couldn't Find Any User." });
+                    res.status(404).send({ message: "User Not Found" });
                   } else {
                     res.status(200).send({ avatarName: fileName });
                   }
@@ -162,9 +157,7 @@ function getAvatar(req, res) {
 
   fs.exists(filePath, (exists) => {
     if (!exists) {
-      res
-        .status(404)
-        .send({ message: "The Avatar You're Looking For Doesn't Exist" });
+      res.status(404).send({ message: "Avatar Requested Doesn't Exist" });
     } else {
       res.sendFile(path.resolve(filePath));
     }
@@ -179,7 +172,7 @@ async function updateUser(req, res) {
   if (userData.password) {
     await bcrypt.hash(userData.password, null, null, (err, hash) => {
       if (err) {
-        res.status(500).send({ message: "Error Encrypting The Password." });
+        res.status(500).send({ message: "Error Encrypting Password" });
       } else {
         userData.password = hash;
       }
@@ -188,12 +181,12 @@ async function updateUser(req, res) {
 
   User.findByIdAndUpdate({ _id: params.id }, userData, (err, userUpdate) => {
     if (err) {
-      res.status(500).send({ message: "Server Error!." });
+      res.status(500).send({ message: "Server Error, Try Again Later!" });
     } else {
       if (!userUpdate) {
-        res.status(404).send({ message: "User Not Found." });
+        res.status(404).send({ message: "User Not Found!" });
       } else {
-        res.status(200).send({ message: "User updated Successfully!!." });
+        res.status(200).send({ message: "User Updated!" });
       }
     }
   });
