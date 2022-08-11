@@ -14,7 +14,7 @@ mongoose.connect(
 
       app.listen(port, () => {
         console.log("######################");
-        console.log("###### API REST ######");
+        console.log("###### HANSEL BACKEND ######");
         console.log("######################");
         console.log(`http://${IP_SERVER}:${port}/api/${API_VERSION}/`);
       });
